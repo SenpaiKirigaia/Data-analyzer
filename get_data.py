@@ -1,7 +1,6 @@
 import re
 import json
 import logging
-
 from send_data import send_data
 
 logging.basicConfig(level=logging.INFO)

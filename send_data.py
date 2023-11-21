@@ -21,7 +21,7 @@ def send_request(measurement, headers):
     logging.info("Response: " + response.text)
 
 
-def send_data(mac_address, data_list):
+def send_data(data_list, mac_address):
     """
     Process data to send measurements one by one.
     Then sends requests to API.
