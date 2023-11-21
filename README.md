@@ -33,7 +33,7 @@ headers = {
     'content-type': "application/json"
 }
 
-url = 'https://api.example.com'
+url = 'https://api.example.com' 
 ```
 ## Usage
 1. Modify the `log_analyzer.py` file to specify the path of the log file you wish to monitor.
