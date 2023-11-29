@@ -50,6 +50,7 @@ def get_data(filename: str):
         mean_ap = re.search(r'Mean AP: (\d+\.\d+) (\w+)', s)
         timestamp = re.search(r'Timestamp: (\d{2}:\d{2}:\d{2} \d{1,2}\.\d{1,2}\.\d{4})', s)
         pulse = re.search(r'Pulse: (\d+\.\d+) (\w+)', s)
+        glucose = re.search(r'Glucose Concentration: (\d+\.\d+) (\w+/\w+)', s)
 
         # Try to extract error text (while trying thermometer log error occurs without it? not sure)
         try:
@@ -71,14 +72,16 @@ def get_data(filename: str):
             data_dict["Error"] = error_text
         if timestamp:
             data_dict["Timestamp"] = timestamp.group(1)
-
+        if glucose:
+            data_dict["Glucose concentration"] = (float(glucose.group(1)), glucose.group(2))
         # WT-50 data extraction
         wt_match = re.search(r'(\d{2}\.\d{2})В°C', s)
         if wt_match:
             temperature = float(wt_match.group(1))
             data_dict["Temperature"] = temperature
 
-        data_list.append(data_dict)
+        if data_dict:
+            data_list.append(data_dict)
 
     # Send data to the server one by one
     send_data(data_list, mac_address)
