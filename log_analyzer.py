@@ -41,7 +41,7 @@ if __name__ == "__main__":
     path = args.filepath
 
     # uncomment for manual testing
-    # path = "C:/Users/79177/my-staff/den/timur/AND_data/and_log.txt"
+    # path = "log.txt"
 
     if not os.path.exists(path):
         logging.error("The file {} does not exist.".format(path))
