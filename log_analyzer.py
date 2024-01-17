@@ -40,6 +40,11 @@ if __name__ == "__main__":
 
     path = args.filepath
 
+    try:
+        get_data(path)
+    except Exception as e:
+        logging.error("Failed to process file: {}".format(e))
+
     # uncomment for manual testing
     # path = "log.txt"
 
@@ -56,7 +61,7 @@ if __name__ == "__main__":
     # Start the observer and wait for keyboard interrupt
     try:
         while True:
-            time.sleep(0.001)  # needed for the observer to not eat up the CPU. Change the value as you see fit.
+            time.sleep(0.001)  # Needed for the observer to not eat up the CPU. Change the value as you see fit.
     except KeyboardInterrupt:
         observer.stop()
     except Exception as e:
