@@ -1,11 +1,11 @@
 # Data-analyzer
 
 ## Overview
-Data-analyzer is a Python project designed for monitoring specific log files and analyzing data from various devices. It processes log files to extract meaningful information and sends this data to a designated API endpoint. The project is especially useful for real-time data analysis and reporting in IoT, healthcare, or any field where log file monitoring is essential.
+Data-analyzer is a Python project designed for scraping log files in the directory and analyzing data from various devices. It processes log files to extract information and sends this data to a designated API endpoint.
 
 ## Repository Structure
 The repository consists of three main Python files:
-- `log_analyzer.py`: This is the main script that sets up a file watcher to monitor changes in a specified log file. Upon detecting a modification, it processes the file to extract data.
+- `log_analyzer.py`: This is the main script that sets up a file watcher to monitor changes in a directory. Upon detecting a modification, it processes the file to extract data, then deletes files with fewer measurements.
 - `get_data.py`: Contains the logic for extracting data from the monitored log file. It supports multiple device types and formats the data for further processing.
 - `send_data.py`: Handles sending the processed data to a defined API endpoint. It ensures that each piece of data is sent only once, avoiding duplicates.
 
@@ -35,12 +35,17 @@ headers = {
 
 url = 'https://api.example.com' 
 ```
+
+## Alternative installation
+1. Clone directory to "C:\Users\your_name\mitra\log-analyzer".
+2. Run install.bat
+3. Change directory for monitoring in the log.bat and run it
 ## Usage
-1. Modify the `log_analyzer.py` file to specify the path of the log file you wish to monitor.
+1. Modify the `log_analyzer.py` file to specify the path of the directory with log files you wish to monitor.
 2. Run `log_analyzer.py`:
     
     ```sh
-    python log_analyzer.py /path/to/your/file.txt
+    python log_analyzer.py /path/to/your/directory
     ```
 3. The script will start monitoring the log file for any changes and process new data as it comes in.
 
