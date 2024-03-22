@@ -1,37 +1,20 @@
 import logging
-import requests
 from auth import url, headers
 
-last_sent_index = 0
+logging.basicConfig(level=logging.INFO)
 
 
-def send_request(measurement, headers):
+def send_data(measurement, mac_address, session):
     """
-    Send request to API.
+    Send measurement to API, using given session.
 
-    :param measurement: dict
-    :param headers: dict
-    :return: None
-    """
-
-    response = requests.post(url=url,
-                             json=measurement,
-                             headers=headers)
-    logging.info("Status Code: " + str(response.status_code))
-    logging.info("Response: " + response.text)
-
-
-def send_data(data_list, mac_address):
-    """
-    Process data to send measurements one by one.
-    Then sends requests to API.
-
-    :param mac_address:
-    :param data_list:
+    :param measurement: Dict
+    :param mac_address: str
+    :param session: requests.Session
     :return:
     """
-
-    global last_sent_index
-    for index, measurement in enumerate(data_list[last_sent_index:], start=last_sent_index):
-        send_request({"device_id": mac_address, "data": measurement}, headers)
-        last_sent_index = index + 1
+    response = session.post(url=url,
+                            json={"device_id": mac_address, "data": measurement},
+                            headers=headers)
+    logging.info("Status Code: " + str(response.status_code))
+    logging.info("Response: " + response.text)

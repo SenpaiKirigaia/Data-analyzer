@@ -12,8 +12,11 @@ class FileChangeHandler(FileSystemEventHandler):
     A class that handles file changes.
     """
 
-    def __init__(self, filename):
-        self.filename = os.path.abspath(filename)
+    def __init__(self, folder):
+        self.directory = os.path.abspath(folder)
+        self.file_indices = {}
+        self.data = None
+        self.index = 1
 
     def on_modified(self, event):
         """
@@ -24,44 +27,49 @@ class FileChangeHandler(FileSystemEventHandler):
         """
         if not event.is_directory:
             abs_path = os.path.abspath(event.src_path)
-            if abs_path == self.filename:
-                logging.info("File {} has been modified. Updating output.json...".format(self.filename))
-            try:
-                # Process the file
-                get_data(self.filename)
-            except Exception as e:
-                logging.error("Failed to process file: {}".format(e))
+            if os.path.dirname(abs_path) == self.directory:
+                logging.info("File {} has been modified. Processing...".format(abs_path))
+                try:
+                    # Process the file and get the updated index
+                    self.data, index = get_data(abs_path, data=self.data, index=self.file_indices.get(abs_path, 1))
+                    self.file_indices[abs_path] = index
+                    logging.info(f"Index for {abs_path}: {index}")
+
+                    # Find the file with the highest index
+                    max_index_file = max(self.file_indices, key=self.file_indices.get)
+                    # self.index = max(self.file_indices.items())
+                    # self.file_indices = {max_index_file: self.index}
+                    # Delete other files
+                    for f in os.listdir(self.directory):
+                        file_path = os.path.join(self.directory, f)
+                        if os.path.isfile(file_path) and file_path != max_index_file:
+                            os.remove(file_path)
+                except Exception as error:
+                    logging.error("Failed to process file: {}".format(error))
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Process a log file and output its data to a JSON file.")
-    parser.add_argument("filepath", help="Path to the log file to be processed.")
+    parser = argparse.ArgumentParser(description="Process log files in a directory and output their data to a JSON "
+                                                 "file.")
+    parser.add_argument("dirpath", help="Path to the directory containing log files.")
     args = parser.parse_args()
 
-    path = args.filepath
+    directory = args.dirpath
 
-    try:
-        get_data(path)
-    except Exception as e:
-        logging.error("Failed to process file: {}".format(e))
-
-    # uncomment for manual testing
-    # path = "log.txt"
-
-    if not os.path.exists(path):
-        logging.error("The file {} does not exist.".format(path))
+    if not os.path.isdir(directory):
+        logging.error("The path {} is not a directory.".format(directory))
         exit(1)
 
     # Create an event handler and an observer
-    event_handler = FileChangeHandler(path)
+    event_handler = FileChangeHandler(directory)
     observer = Observer()
-    observer.schedule(event_handler, path=os.path.dirname(path), recursive=False)
+    observer.schedule(event_handler, path=directory, recursive=False)
     observer.start()
 
     # Start the observer and wait for keyboard interrupt
     try:
         while True:
-            time.sleep(0.001)  # Needed for the observer to not eat up the CPU. Change the value as you see fit.
+            time.sleep(0.0001)  # Needed for the observer to not eat up the CPU. Change the value as you see fit.
     except KeyboardInterrupt:
         observer.stop()
     except Exception as e:
@@ -70,10 +78,6 @@ if __name__ == "__main__":
     finally:
         observer.join()
 
-    # Инструкции по запуску:
-    # Запустите скрипт из командной строки, указав путь к файлу, который нужно отслеживать:
-    # python log-analyser.py /path/to/your/file.txt
-
     # Instructions for running:
-    # Run the script from the command line, specifying the path to the file to be tracked:
-    # python log-analyser.py /path/to/your/file.txt
+    # Run the script from the command line, specifying the path to the directory containing log files:
+    # python log-analyser.py /path/to/your/directory
